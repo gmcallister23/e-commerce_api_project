@@ -2,6 +2,7 @@ from __future__ import annotations
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from sqlalchemy import Table, Column, Integer, String, ForeignKey, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 from marshmallow import ValidationError 
 from typing import List, Optional
@@ -21,6 +22,14 @@ db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 ma = Marshmallow(app)
 
+#Order_Product association table
+order_product = Table(
+    'order_product', 
+    Base.metadata,
+    Column('product_id', ForeignKey('products.id'), primary_key=True),
+    Column('order_id', ForeignKey('orders.id'), primary_key=True)
+)
+
 #Models
 #User Table
 
@@ -28,7 +37,7 @@ ma = Marshmallow(app)
 
 #Order table
 
-#Order_Product association table
+
 
 #Schemas
 #User Schema
