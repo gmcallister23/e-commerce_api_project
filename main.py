@@ -8,8 +8,18 @@ from typing import List, Optional
 
 app = Flask(__name__)
 
-app.config['SQLAlCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:Vjzs3455@localhost/ecommerce_api'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:Vjzs3455@localhost/ecommerce_api'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+#Base model
+
+class Base(DeclarativeBase):
+    pass
+
+#Initialize SQLAlchemy and Marshmallow - creates the engine and connects to the database
+db = SQLAlchemy(model_class=Base)
+db.init_app(app)
+ma = Marshmallow(app)
 
 #Models
 #User Table
@@ -33,4 +43,6 @@ app.config['SQLAlCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:Vjzs3455@lo
 
 #Order Routes
 
-
+with app.app_context():
+    #db.drop_all()
+    db.create_all()
