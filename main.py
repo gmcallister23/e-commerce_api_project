@@ -41,6 +41,7 @@ class User(Base):
     email: Mapped[Optional[str]] = mapped_column(String(200), unique=True)
     #One to many - user to orders
     orders = Mapped[List['Order']] = relationship('Order', back_populates='user')
+
 #Product table
 class Product(Base):
     __tablename__ = 'products'
@@ -49,6 +50,7 @@ class Product(Base):
     price: Mapped[float] = mapped_column(Float(5), nullable=False)
     #Many-many - orders and products
     orders: Mapped[List['Order']] = relationship('Order', secodary=order_product, back_populates='products')
+
 #Order table
 class Order(Base):
     __tablename__ = 'orders'
@@ -61,14 +63,87 @@ class Order(Base):
 
 #Schemas
 #User Schema
-
+class UserSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = User
+    
 #Order Schema
+class OrderSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Order
+
+#Initialize Schema
+user_schema = UserSchema()
+users_schema = UserSchema(many=True)
+order_schema = OrderSchema()
+orders_schema = OrderSchema(many=True)
 
 #Routes
 
 #User Routes
+#read all users
+@app.route('/users', methods = ['GET'])
+def get_users():
+    query = select(User)
+    users = db.session.execute(query).scalars().all()
 
+    return users_schema.jsonify(users), 200
+
+#read an individual user by id
+@app.route('/users/<int:id>', methods=['GET'])
+def get_user(id):
+    user = db.session.get(User, id)
+    return user_schema.jsonify(user), 200
+
+#create a new user POST
+@app.route('/users', methods=['PUT'])
+def create_user():
+    try:
+        user_data = user_schema.load(request.json) #--> 'load' deserializes the json data into python formats
+    except ValidationError as e:
+        return jsonify(e.messages), 400
+    
+    new_user = User(name=user_data['name'], email=user_data['email'])
+    db.session.add(new_user)
+    db.session.commit()
+
+    return user_schema.jsonify(new_user), 201 #---> this returns the new data in json format
+
+#Update a user by id <int:id> 'PUT'
+@app.route('/users/<int:id>', methods=['PUT'])
+def update_user(id):
+    user = db.session.get(User, id)
+
+    if not user:
+        return jsonify({'messages': 'Invalid user id'}), 400
+    
+    try:
+        user_data = user_schema.load(request.json)
+
+    except ValidationError as e:
+        return jsonify(e.messages), 400
+    
+    user.name = user_data['name']
+    user.address = user_data['address']
+    user.email = user_data['email']
+
+    db.session.commit()
+    return user_schema.jsonify(user), 200
+
+#Delete a user by id 'DELETE'
+@app.route('/users/<int:id>', methods=['DELETE'])
+def delete_user(id):
+    user = db.session.get(User, id)
+
+    if not user:
+        return jsonify({'message': f'Invalid user id.'})
+    
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'message': f'Successfully delete user {id}'}), 200
+ 
 #Product Routes
+
 
 #Order Routes
 
