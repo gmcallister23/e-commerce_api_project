@@ -103,7 +103,7 @@ def get_user(id):
     return user_schema.jsonify(user), 200
 
 #create a new user POST
-@app.route('/users', methods=['PUT'])
+@app.route('/users', methods=['POST'])
 def create_user():
     try:
         user_data = user_schema.load(request.json) #--> 'load' deserializes the json data into python formats
