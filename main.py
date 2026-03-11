@@ -40,7 +40,7 @@ class User(Base):
     address: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[Optional[str]] = mapped_column(String(200), unique=True)
     #One to many - user to orders
-    orders = Mapped[List['Order']] = relationship('Order', back_populates='user')
+    orders: Mapped[List['Order']] = relationship('Order', back_populates='users') #Debugged with ChatGPT - orders = xxxx to orders:xxx, updated the rest that had '=' instead of ':'
 
 #Product table
 class Product(Base):
@@ -58,8 +58,8 @@ class Order(Base):
     order_date: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     #One to many - user --> orders
-    user = Mapped['User'] = relationship('User', back_populates='orders')
-    products = Mapped[List['Product']] = relationship('Product', secondary=order_product, back_populates='orders')
+    user: Mapped['User'] = relationship('User', back_populates='orders')
+    products: Mapped[List['Product']] = relationship('Product', secondary=order_product, back_populates='orders')
 
 #Schemas
 #User Schema
