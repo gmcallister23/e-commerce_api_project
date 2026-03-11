@@ -40,7 +40,7 @@ class User(Base):
     address: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[Optional[str]] = mapped_column(String(200), unique=True)
     #One to many - user to orders
-    orders: Mapped[List['Order']] = relationship('Order', back_populates='users') #Debugged with ChatGPT - orders = xxxx to orders:xxx, updated the rest that had '=' instead of ':'
+    orders: Mapped[List['Order']] = relationship('Order', back_populates='user') #Debugged with ChatGPT - orders = xxxx to orders:xxx, updated the rest that had '=' instead of ':'
 
 #Product table
 class Product(Base):
@@ -167,7 +167,7 @@ def get_product(id):
     return product_schema.jsonify(product)
 
 #Add product 'POST'
-@app.route('/products', methods='POST')
+@app.route('/products', methods=['POST'])
 def create_product():
     try:
         product_data = product_schema.load(request.json)
