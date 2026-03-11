@@ -49,7 +49,7 @@ class Product(Base):
     product_name: Mapped[str] = mapped_column(String(30), nullable=False)
     price: Mapped[float] = mapped_column(Float(5), nullable=False)
     #Many-many - orders and products
-    orders: Mapped[List['Order']] = relationship('Order', secodary=order_product, back_populates='products')
+    orders: Mapped[List['Order']] = relationship('Order', secondary=order_product, back_populates='products')
 
 #Order table
 class Order(Base):
