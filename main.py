@@ -110,7 +110,7 @@ def create_user():
     except ValidationError as e:
         return jsonify(e.messages), 400
     
-    new_user = User(name=user_data['name'], email=user_data['email'])
+    new_user = User(name=user_data['name'], address=user_data['address'], email=user_data['email'])
     db.session.add(new_user)
     db.session.commit()
 
@@ -276,7 +276,7 @@ def get_products(order_id):
 if __name__ == '__main__':
 
     with app.app_context():
-        #db.drop_all()
+        db.drop_all()
         db.create_all()
 
     app.run(debug=True)
