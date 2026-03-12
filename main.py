@@ -179,6 +179,8 @@ def create_product():
     db.session.add(new_product)
     db.session.commit()
 
+    return product_schema.jsonify(new_product), 201
+
 #Update a product 'PUT'
 @app.route('/products', methods=['PUT'])
 def update_product():
