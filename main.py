@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from sqlalchemy import Table, Column, Integer, String, ForeignKey, Float, DateTime, func, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
-from marshmallow import ValidationError 
+from marshmallow import ValidationError, fields
 from typing import List, Optional
 from datetime import datetime
 
@@ -55,8 +55,8 @@ class Product(Base):
 class Order(Base):
     __tablename__ = 'orders'
     id: Mapped[int] = mapped_column(primary_key=True)
-    order_date: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    order_date: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False) #required=True) #Debugged and learned required belongs in the schema set up, moved both required to schema
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False) #required=True)
     #One to many - user --> orders
     user: Mapped['User'] = relationship('User', back_populates='orders')
     products: Mapped[List['Product']] = relationship('Product', secondary=order_product, back_populates='orders')
@@ -78,6 +78,9 @@ class ProductSchema(ma.SQLAlchemyAutoSchema):
 class OrderSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Order
+    
+    user_id = fields.Int(required=True)
+    #order_date = fields.Str(required=True) Don't need, when I first tried to POST in Postman, i received 'unknown field'.  In debugging with ChatGPT I found out I don't need this in my schema because of how it is set up in my model class, it automatically sends the time stamp.
 
 #Initialize Schema
 user_schema = UserSchema()
@@ -231,7 +234,8 @@ def create_order():
     
     new_order=Order(
         user_id=order_data['user_id'], 
-        order_date=order_data['order_date'])
+        #order_date=order_data['order_date'] # In debugging with ChatGPT an error in Postman, since the model class automatically sends the timestamp, this is not necessary
+        )
     db.session.add(new_order)
     db.session.commit()
 
