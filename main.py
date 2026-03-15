@@ -65,12 +65,14 @@ class Order(Base):
 #User Schema
 class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = User; include_fk=True
+        model = User 
+        include_fk=True
 
 #Product Schema
 class ProductSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Product
+        include_fk = True
     
 #Order Schema
 class OrderSchema(ma.SQLAlchemyAutoSchema):
@@ -182,9 +184,12 @@ def create_product():
     return product_schema.jsonify(new_product), 201
 
 #Update a product 'PUT'
-@app.route('/products', methods=['PUT'])
-def update_product():
+@app.route('/products/<int:id>', methods=['PUT'])
+def update_product(id):
     product = db.session.get(Product, id)
+
+    print("ID received from URL:", id)
+    print("JSON received from Postman:", request.json)
 
     if not product:
         return jsonify({'messages': 'Invalid product id'})
@@ -195,11 +200,12 @@ def update_product():
     except ValidationError as e:
         return jsonify(e.messages), 400
     
-    product.product_name = product_data['name']
+    product.product_name = product_data['product_name']
     product.price = product_data['price']
     
     db.session.commit()
     return product_schema.jsonify(product), 200
+
 
 #Delete a product by id <int:id> 'DELETE'
 @app.route('/products/<int:id>', methods=['DELETE'])
@@ -266,7 +272,7 @@ def get_order(user_id):
 
 #Get all products in an order 'GET'
 app.route('/orders/<order_id>/products', methods=['GET'])
-def get_products(order_id):
+def get_order_products(order_id):
 
     order = Order.query.get(order_id)
     if not order:
@@ -278,7 +284,7 @@ def get_products(order_id):
 if __name__ == '__main__':
 
     with app.app_context():
-        db.drop_all()
+        #db.drop_all()
         db.create_all()
 
     app.run(debug=True)
