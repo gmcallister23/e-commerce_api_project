@@ -262,14 +262,27 @@ def add_product(order_id, product_id):
     return jsonify({'message': f"Product {product_id} was added to order {order_id}"}), 200
 
 #Remove a product from an order - 'DELETE'
-@app.route('/orders/<int:order_id>/remove_product/<product_id>')
-def remove_product(product_id, order_id):
+@app.route('/orders/<int:order_id>/remove_product/<int:product_id>')
+def remove_product(order_id, product_id):
     order = db.session.get(Order, order_id)
     product = db.session.get(Product, product_id)
 
-    db.session.delete(product)
+    #Check to see if order and/or product exist
+    if not order:
+        return jsonify({'messages': 'Order not found'}), 400
+    
+    if not product:
+        return jsonify({'messages': 'Product not found'}), 400
+
+    #Check to see if project exists in the order
+
+    if product not in order.products:
+        return jsonify({'messages': 'Product not in order'}), 400
+
+    #db.session.delete(product)--> Deletes from the entire database
+    order.products.remove(product) #--> removes product from order only
     db.session.commit()
-    return jsonify({'message': f'Successfully deleted {product_id} from {order_id}'})
+    return jsonify({'messages': f'Successfully deleted {product_id} from {order_id}'})
 
 #Get all orders for a user 'GET'
 @app.route('/orders/user/<int:user_id>', methods=['GET'])
