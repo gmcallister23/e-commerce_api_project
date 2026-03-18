@@ -27,7 +27,7 @@ ma = Marshmallow(app)
 order_product = Table(
     'order_product', 
     Base.metadata,
-    Column('product_id', ForeignKey('products.id'), primary_key=True) #unique=True --> removed, this would make it so that only one product could be used across ALL orders
+    Column('product_id', ForeignKey('products.id'), primary_key=True), #unique=True --> removed, this would make it so that only one product could be used across ALL orders
     Column('order_id', ForeignKey('orders.id'), primary_key=True)
 )
 
