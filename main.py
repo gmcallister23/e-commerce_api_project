@@ -253,7 +253,7 @@ def add_product(order_id, product_id):
         return jsonify({'error': 'Product not found'}), 400
     
     if product in order.products:
-        return jsonify({'message': f"Product {product_id} is alread in order {order_id}"})
+        return jsonify({'message': f"Product {product_id} is already in order {order_id}"})
 
     #product.orders.append(order) this is backwards
     order.products.append(product)
