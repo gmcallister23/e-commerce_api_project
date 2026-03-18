@@ -27,7 +27,7 @@ ma = Marshmallow(app)
 order_product = Table(
     'order_product', 
     Base.metadata,
-    Column('product_id', ForeignKey('products.id'), primary_key=True, unique=True),
+    Column('product_id', ForeignKey('products.id'), primary_key=True) #unique=True --> removed, this would make it so that only one product could be used across ALL orders
     Column('order_id', ForeignKey('orders.id'), primary_key=True)
 )
 
@@ -243,15 +243,20 @@ def create_order():
 
 #Add a product to an order - prevent duplicates 'PUT'
 @app.route('/orders/<int:order_id>/add_product/<product_id>', methods=['PUT'])
-def add_product(product_id, order_id):
-    product = db.session.get(Product, product_id)
+def add_product(order_id, product_id):
     order = db.session.get(Order, order_id)
+    product = db.session.get(Product, product_id)
+    
+    if not order:
+        return jsonify({'message': f'Order not found'}), 400
+    if not product:
+        return jsonify({'error': 'Cannot have more than one product in an order.'}), 400
 
-    if product in order.products:
-        return{'error': 'Cannot have more than one product in an order.'}
-
-    product.orders.append(order)
+    #product.orders.append(order) this is backwards
+    order.products.append(product)
     db.session.commit()
+
+    return jsonify({'message': f"Product {product_id} was added to order {order_id}"}), 200
 
 #Remove a product from an order - 'DELETE'
 @app.route('/orders/<int:order_id>/remove_product/<product_id>')
