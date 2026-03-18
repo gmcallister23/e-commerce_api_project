@@ -308,12 +308,12 @@ def get_order_products(order_id):
         return jsonify({'message': f'Order not found'}), 400
     
     #product = Product.query.filter_by(order_id=order_id).all() --> Product does not have an order_id column so it cannot referene that data which doesn't technically exist
-    products = order.products
+    products = order.products #calls a list of products in an order
 
     if not products:
         return jsonify({'messages': 'No products in this order'}), 200
 
-    return products_schema.dump(products), 200
+    return products_schema.dump(products), 200 #returns many products
 
 if __name__ == '__main__':
 
