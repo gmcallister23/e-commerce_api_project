@@ -288,14 +288,14 @@ def remove_product(order_id, product_id):
 @app.route('/orders/user/<int:user_id>', methods=['GET'])
 def get_order(user_id):
 
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         return jsonify({'message': 'User not found'}), 400
     
     #query = select(Order, user_id)
     #orders = db.session.execute().scalars().all()
     orders = Order.query.filter_by(user_id=user_id).all()
-    return order_schema.dump(orders), 200
+    return orders_schema.dump(orders), 200
 
 #Get all products in an order 'GET'
 @app.route('/orders/<int:order_id>/products', methods=['GET'])
