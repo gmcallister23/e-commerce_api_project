@@ -298,15 +298,22 @@ def get_order(user_id):
     return order_schema.dump(orders), 200
 
 #Get all products in an order 'GET'
-@app.route('/orders/<order_id>/products', methods=['GET'])
+@app.route('/orders/<int:order_id>/products', methods=['GET'])
 def get_order_products(order_id):
+    order = db.session.get(Order, order_id)
+    #product = db.session.get(Product, product_id)
 
-    order = Order.query.get(order_id)
+    #order = Order.query.get(order_id) --> redundant and doesn't match my other routes
     if not order:
         return jsonify({'message': f'Order not found'}), 400
     
-    product = Product.query.filter_by(order_id='order_id').all()
-    return product_schema.dump(product), 200
+    #product = Product.query.filter_by(order_id=order_id).all() --> Product does not have an order_id column so it cannot referene that data which doesn't technically exist
+    products = order.products
+
+    if not products:
+        return jsonify({'messages': 'No products in this order'}), 200
+
+    return products_schema.dump(products), 200
 
 if __name__ == '__main__':
 
