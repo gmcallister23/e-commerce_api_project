@@ -239,30 +239,32 @@ def create_order():
     db.session.add(new_order)
     db.session.commit()
 
+    return order_schema.jsonify(new_order), 201
+
 #Add a product to an order - prevent duplicates 'PUT'
 @app.route('/orders/<int:order_id>/add_product/<product_id>', methods=['PUT'])
 def add_product(product_id, order_id):
     product = db.session.get(Product, product_id)
     order = db.session.get(Order, order_id)
 
-    if product in order:
+    if product in order.products:
         return{'error': 'Cannot have more than one product in an order.'}
 
     product.orders.append(order)
     db.session.commit()
 
 #Remove a product from an order - 'DELETE'
-app.route('/orders/<int:order_id>/remove_product/<product_id>')
+@app.route('/orders/<int:order_id>/remove_product/<product_id>')
 def remove_product(product_id, order_id):
     order = db.session.get(Order, order_id)
     product = db.session.get(Product, product_id)
 
     db.session.delete(product)
-    db.session.commit
+    db.session.commit()
     return jsonify({'message': f'Successfully deleted {product_id} from {order_id}'})
 
 #Get all orders for a user 'GET'
-app.route('/orders/user/<int:user_id>', methods=['GET'])
+@app.route('/orders/user/<int:user_id>', methods=['GET'])
 def get_order(user_id):
 
     user = User.query.get(user_id)
@@ -271,11 +273,11 @@ def get_order(user_id):
     
     #query = select(Order, user_id)
     #orders = db.session.execute().scalars().all()
-    orders = Order.query.filter_by(user_id='user_id').all()
+    orders = Order.query.filter_by(user_id=user_id).all()
     return order_schema.dump(orders), 200
 
 #Get all products in an order 'GET'
-app.route('/orders/<order_id>/products', methods=['GET'])
+@app.route('/orders/<order_id>/products', methods=['GET'])
 def get_order_products(order_id):
 
     order = Order.query.get(order_id)
