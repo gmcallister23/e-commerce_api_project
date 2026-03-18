@@ -262,7 +262,7 @@ def add_product(order_id, product_id):
     return jsonify({'message': f"Product {product_id} was added to order {order_id}"}), 200
 
 #Remove a product from an order - 'DELETE'
-@app.route('/orders/<int:order_id>/remove_product/<int:product_id>')
+@app.route('/orders/<int:order_id>/remove_product/<int:product_id>', methods=['DELETE'])
 def remove_product(order_id, product_id):
     order = db.session.get(Order, order_id)
     product = db.session.get(Product, product_id)
