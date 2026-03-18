@@ -242,7 +242,7 @@ def create_order():
     return order_schema.jsonify(new_order), 201
 
 #Add a product to an order - prevent duplicates 'PUT'
-@app.route('/orders/<int:order_id>/add_product/<product_id>', methods=['PUT'])
+@app.route('/orders/<int:order_id>/add_product/<int:product_id>', methods=['PUT'])
 def add_product(order_id, product_id):
     order = db.session.get(Order, order_id)
     product = db.session.get(Product, product_id)
@@ -250,7 +250,10 @@ def add_product(order_id, product_id):
     if not order:
         return jsonify({'message': f'Order not found'}), 400
     if not product:
-        return jsonify({'error': 'Cannot have more than one product in an order.'}), 400
+        return jsonify({'error': 'Product not found'}), 400
+    
+    if product in order.products:
+        return jsonify({'message': f"Product {product_id} is alread in order {order_id}"})
 
     #product.orders.append(order) this is backwards
     order.products.append(product)
