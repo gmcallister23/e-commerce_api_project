@@ -294,7 +294,7 @@ def get_order(user_id):
     
     #query = select(Order, user_id)
     #orders = db.session.execute().scalars().all()
-    orders = Order.query.filter_by(user_id=user_id).all()
+    orders = db.session.query(Order).filter_by(user_id=user_id).all()
     return orders_schema.dump(orders), 200
 
 #Get all products in an order 'GET'
